@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ValidationAttributesAndService.Attributes
 {
+    [AttributeUsage(AttributeTargets.Property)]
     public class StringLengthValidationAttribute : BaseValidationAttribute
     {
         private readonly int validStringLength;
@@ -14,9 +15,9 @@ namespace ValidationAttributesAndService.Attributes
 
         public override bool Validate(object obj)
         {
-            if (obj is string value && value != null)
+            if (obj != null && obj is string value && value.Length <= this.validStringLength)
             {
-                return value.Length == this.validStringLength;
+                return true;
             }
 
             return false;
