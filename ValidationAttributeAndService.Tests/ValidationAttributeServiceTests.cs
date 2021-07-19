@@ -16,10 +16,10 @@ namespace ValidationAttributesAndService.Tests
         }
 
         [TestCaseSource(typeof(TestCaseSource), nameof(TestCaseSource.ValidValidationAttributeSource))]
-        public void Validate_ValidData_ReturnTrue(object obj) => Assert.IsTrue(ValidationAttributeService.Validate(obj));
+        public void Validate_ValidData_ReturnTrue(object obj) => Assert.IsTrue(ValidationAttributeService.Validate(obj).IsValid);
 
         [TestCaseSource(typeof(TestCaseSource), nameof(TestCaseSource.InvalidValidationAttributeSource))]
-        public void Validate_InvalidData_ReturnFalse(object obj) => Assert.IsFalse(ValidationAttributeService.Validate(obj));
+        public void Validate_InvalidData_ReturnFalse(object obj) => Assert.IsFalse(ValidationAttributeService.Validate(obj).IsValid);
 
         [TestCaseSource(typeof(TestCaseSource), nameof(TestCaseSource.SetOfInvalidValidationAttributeRecords))]
         public void Validate_InvalidData_ReturnFalseWriteToLogFile(IEnumerable<object> setOfObjects)

@@ -17,18 +17,6 @@ namespace ValidationAttributesAndService.Attributes
         /// <returns>
         /// <c>True</c> if validation passed successful, otherwise <c>false</c>.
         /// </returns>
-        public override bool Validate(object obj) => obj switch
-        {
-            _ when obj.GetType().IsGenericType => obj != null,
-            char symbol => symbol != default,
-            int value => value != default,
-            long value => value != default,
-            decimal value => value != default,
-            float value => value != default,
-            double value => value != default,
-            byte value => value != default,
-            short value => value != default,
-            _ => true
-        };
+        public override bool Validate(object obj) => obj is not null;
     }
 }

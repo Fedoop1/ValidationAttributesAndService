@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using NLog;
 using ValidationAttributesAndService.Attributes;
@@ -22,7 +23,7 @@ namespace ValidationAttributesAndService
         /// or
         /// validation object is null.
         /// </exception>
-        public static bool Validate<T>(T obj, ILogger logger)
+        public static ValidationResult Validate<T>(T obj, ILogger logger)
         {
             if (logger is null)
             {
@@ -35,6 +36,8 @@ namespace ValidationAttributesAndService
             }
 
             bool objectIsValid = true;
+            List<BaseValidationAttribute> invalidAttributes = new List<BaseValidationAttribute>();
+            List<string> failureMessages = new List<string>();
 
             foreach (var property in obj.GetType().GetProperties())
             {
@@ -42,13 +45,21 @@ namespace ValidationAttributesAndService
                 {
                     if (!attribute.Validate(property.GetValue(obj)))
                     {
-                        logger.Error($"Failed validation of the attribute {attribute.GetType().Name}. Property name: {property.Name}. Property value: {property.GetValue(obj)}. Failure message: {attribute.FailureMessage}.");
+                        var failureMessage = $"Failed validation of the attribute {attribute.GetType().Name}. " +
+                            $"Property name: {property.Name}. " +
+                            $"Property value: {property.GetValue(obj) ?? "empty"}. " +
+                            $"Failure message: {attribute.FailureMessage}.";
+
+                        logger.Error(failureMessage);
+                        failureMessages.Add(failureMessage);
+                        invalidAttributes.Add(attribute);
+
                         objectIsValid = false;
                     }
                 }
             }
 
-            return objectIsValid;
+            return new ValidationResult(obj, objectIsValid, failureMessages, invalidAttributes);
         }
 
         /// <summary>
@@ -57,6 +68,7 @@ namespace ValidationAttributesAndService
         /// <typeparam name="T">Type of validation object.</typeparam>
         /// <param name="obj">The validation object.</param>
         /// <returns><c>True</c> if validation passed successful, otherwise <c>false</c>.</returns>
-        public static bool Validate<T>(T obj) => Validate(obj, LogManager.CreateNullLogger());
+        public static ValidationResult Validate<T>(T obj) => Validate(obj, LogManager.CreateNullLogger());
+
     }
 }
